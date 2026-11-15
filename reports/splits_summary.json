@@ -1,0 +1,79 @@
+{
+  "seed": 42,
+  "proportions": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "family_by_split": {
+    "BENIGN": {
+      "train": 1466700,
+      "test": 314294,
+      "val": 314293
+    },
+    "BruteForce": {
+      "train": 6405,
+      "val": 1372,
+      "test": 1373
+    },
+    "DoS": {
+      "train": 135621,
+      "test": 29062,
+      "val": 29062
+    },
+    "Other-rare": {
+      "train": 33,
+      "val": 7,
+      "test": 7
+    },
+    "DDoS": {
+      "train": 89610,
+      "val": 19202,
+      "test": 19202
+    },
+    "Bot": {
+      "train": 1364,
+      "val": 292,
+      "test": 292
+    },
+    "PortScan": {
+      "train": 63486,
+      "test": 13604,
+      "val": 13604
+    },
+    "WebAttack": {
+      "val": 322,
+      "train": 1500,
+      "test": 321
+    }
+  },
+  "family_by_day_split": {
+    "BENIGN": {
+      "train": 1323802,
+      "test": 771485
+    },
+    "BruteForce": {
+      "train": 9150
+    },
+    "DoS": {
+      "train": 193745
+    },
+    "Other-rare": {
+      "train": 11,
+      "test": 36
+    },
+    "DDoS": {
+      "test": 128014
+    },
+    "PortScan": {
+      "test": 90694
+    },
+    "Bot": {
+      "test": 1948
+    },
+    "WebAttack": {
+      "test": 2143
+    }
+  },
+  "attack_families_in_both_day_splits": []
+}
