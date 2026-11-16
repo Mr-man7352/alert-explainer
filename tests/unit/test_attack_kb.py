@@ -181,3 +181,49 @@ def test_real_kb_mapped_techniques_have_expected_names(real_kb: KnowledgeBase) -
         assert real_kb[tid].name == name
     assert len(real_kb) > 500
     assert all(real_kb[t].mitigations for t in MAPPED_IDS)
+
+
+class _FakeResponse:
+    def __init__(self, body: bytes, length: int) -> None:
+        self._body, self.headers = body, {"Content-Length": str(length)}
+
+    def read(self, n: int) -> bytes:
+        chunk, self._body = self._body[:n], self._body[n:]
+        return chunk
+
+    def __enter__(self) -> "_FakeResponse":
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        return None
+
+
+def test_download_rejects_truncated_and_wrong_hash(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hashlib
+
+    from alert_explainer.explain import attack_kb
+
+    body = b'{"type": "bundle", "objects": []}'
+    calls: list[int] = []
+
+    def truncated(url: str, timeout: int) -> _FakeResponse:
+        calls.append(1)
+        return _FakeResponse(body[:10], len(body))  # connection ends early, no exception
+
+    monkeypatch.setattr(attack_kb.urllib.request, "urlopen", truncated)
+    with pytest.raises(OSError, match="truncated"):
+        attack_kb.download_bundle(tmp_path, "9.9", attempts=2)
+    assert len(calls) == 2 and not list(tmp_path.iterdir())  # nothing half-written is kept
+
+    monkeypatch.setitem(attack_kb.KNOWN_SHA256, "9.9", "0" * 64)
+    monkeypatch.setattr(
+        attack_kb.urllib.request, "urlopen", lambda url, timeout: _FakeResponse(body, len(body))
+    )
+    with pytest.raises(OSError, match="SHA-256"):
+        attack_kb.download_bundle(tmp_path, "9.9", attempts=1)
+
+    monkeypatch.setitem(attack_kb.KNOWN_SHA256, "9.9", hashlib.sha256(body).hexdigest())
+    path = attack_kb.download_bundle(tmp_path, "9.9", attempts=1)
+    assert path.read_bytes() == body

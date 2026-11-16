@@ -294,8 +294,13 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def download_bundle(dest_dir: Path, version: str = ATTACK_VERSION) -> Path:
-    """Download the pinned Enterprise ATT&CK bundle once; later calls reuse the file."""
+def download_bundle(dest_dir: Path, version: str = ATTACK_VERSION, attempts: int = 3) -> Path:
+    """Download the pinned Enterprise ATT&CK bundle once; later calls reuse the file.
+
+    A connection can end early without raising, which leaves a truncated file (seen on the first
+    real run). So the download goes to a ``.part`` file and is kept only if its size matches
+    ``Content-Length`` and, for a pinned version, its SHA-256 matches ``KNOWN_SHA256``.
+    """
     dest_dir.mkdir(parents=True, exist_ok=True)
     path = dest_dir / f"enterprise-attack-{version}.json"
     if path.exists():
@@ -304,12 +309,25 @@ def download_bundle(dest_dir: Path, version: str = ATTACK_VERSION) -> Path:
     if not url.startswith("https://"):  # pragma: no cover - the constant is https
         raise ValueError("refusing a non-HTTPS download")
     tmp = path.with_suffix(".part")
-    print(f"Downloading ATT&CK {version} (~55 MB) from {url}")
-    with urllib.request.urlopen(url, timeout=120) as resp, tmp.open("wb") as fh:  # noqa: S310
-        while chunk := resp.read(1 << 20):
-            fh.write(chunk)
-    tmp.replace(path)
-    return path
+    expected = KNOWN_SHA256.get(version)
+    problem = ""
+    for attempt in range(1, attempts + 1):
+        print(f"Downloading ATT&CK {version} (~55 MB) from {url} (attempt {attempt}/{attempts})")
+        with urllib.request.urlopen(url, timeout=120) as resp, tmp.open("wb") as fh:  # noqa: S310
+            length = resp.headers.get("Content-Length")
+            while chunk := resp.read(1 << 20):
+                fh.write(chunk)
+        size = tmp.stat().st_size
+        if length is not None and size != int(length):
+            problem = f"truncated download: {size:,} of {int(length):,} bytes"
+        elif expected and sha256_file(tmp) != expected:
+            problem = "SHA-256 does not match the pinned value"
+        else:
+            tmp.replace(path)
+            return path
+        print(f"  {problem}; retrying")
+    tmp.unlink(missing_ok=True)
+    raise OSError(f"Could not download ATT&CK {version}: {problem}")
 
 
 def build_kb(
@@ -322,8 +340,8 @@ def build_kb(
     if bundle is None and expected and digest != expected:
         raise ValueError(
             f"{path.name}: SHA-256 {digest} does not match the pinned {expected}. "
-            "Delete the file to re-download, or review the upstream change before updating "
-            "KNOWN_SHA256."
+            "It may be a truncated download: delete it and run `ae attack-kb` again. If the "
+            "upstream file really changed, review the change before updating KNOWN_SHA256."
         )
     kb = parse_bundle(json.loads(path.read_text(encoding="utf-8")))
     verify_mapping(kb)

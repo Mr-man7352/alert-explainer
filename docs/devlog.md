@@ -215,6 +215,10 @@ The blueprint planned Day 6 for 17 Nov and Day 7 for 18 Nov; both were built on 
 - **Two retrieval checks, one easy and one hard.** The easy query names the attack. The hard one
   ("features only") gives just the port and the unusual flow statistics of that family's alerts, which
   shows how little the fallback can infer from numbers alone. That is why it is only a fallback.
+- **Downloads are verified before they are kept.** The first real download on the Mac ended ~14 KB
+  short without any error (a truncated JSON file); the SHA-256 pin caught it. `download_bundle`
+  now writes to a `.part` file, checks its size against `Content-Length` and its hash against the
+  pin, retries up to 3 times, and only then renames it into place.
 - Fixed five misplaced `# fmt: skip` comments in `detect/compare.py` (ruff RUF028), which would
   have failed CI's lint step.
 
