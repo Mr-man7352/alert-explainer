@@ -135,3 +135,93 @@ The blueprint planned Days 1–3 for 12–14 Nov; all three were built on the 14
 - Re-run `make train-mlp cross-day compare` with the schedule fix, and copy the numbers
   into the README results table and section 2 of the blueprint.
 - Day 6: SHAP for LightGBM and Captum Integrated Gradients for the MLP, against the deployed model.
+
+## Days 6–7 (built Mon 16 Nov 2026)
+
+The blueprint planned Day 6 for 17 Nov and Day 7 for 18 Nov; both were built on the 16th.
+
+### Built
+- **Day 6, synthetic inventory** (`data/inventory.py`, `ae inventory`): one asset per internal IP in
+  the flows (192.168.10.x plus the firewall's NAT address 172.16.0.1). The domain controller (.3),
+  web server (.50) and second server (.51) follow the roles on the CIC-IDS2017 dataset page and get
+  criticality 3/3/2. Every other address is a workstation in one of seven departments (Finance,
+  HR and Legal machines are criticality 2, the rest 1). Names come from Faker with a fixed seed, and
+  e-mails use the reserved `corp.example` domain. Each row is marked `synthetic=true`.
+- **Day 6, deterministic severity** (`detect/severity.py`, `ae severity-table` →
+  `docs/severity_rules.md`): `base[family] × confidence band × asset criticality`, each 1–3, so the
+  score is 1–27. Scores 1–3 are Low, 4–9 Medium, 12–18 High and 27 Critical. All 63 combinations are
+  unit-tested against a hand-written copy of the table.
+- **Day 6, attributions** (`detect/attribution.py`, `detect/detectors.py`): TreeSHAP for LightGBM and
+  Captum Integrated Gradients for the MLP, both towards the predicted family. The top 5 features carry
+  their value and their percentile among BENIGN training flows (`models/benign_reference.npz`).
+- **Day 6, alert builder** (`detect/alerts.py`, `explain/schemas.py`, `ae build-alerts`): a frozen
+  Pydantic `Alert` per flagged flow. `ae build-alerts` scores the whole test split and samples 100
+  flagged flows stratified by predicted family. It builds them one at a time (so latency is per
+  alert) and writes `data/alerts/alerts_<model>.json` plus `reports/alerts_summary_<model>.json`.
+- **Day 7, ATT&CK knowledge base** (`explain/attack_kb.py`, `ae attack-kb`): Enterprise ATT&CK
+  v20.1 from MITRE's `attack-stix-data` repository, pinned by version and SHA-256. It parses to 706
+  active techniques (479 sub-techniques), each with its mitigations (with the technique-specific
+  guidance text) and the v18+ detection strategies that cover it.
+- **Day 7, mapping table + retrieval** (`explain/retrieve.py`): family → technique IDs first, then an
+  embedding fallback (MiniLM, or TF-IDF offline) that adds 3 *candidate* techniques for ambiguous
+  alerts. `ae retrieval-check` writes `reports/retrieval_check.md`.
+- 125 new tests (176 in total; one is skipped until the real KB is built), still on synthetic data
+  only: no downloads in CI.
+
+### Decisions
+- **SHAP from LightGBM itself.** `booster.predict(pred_contrib=True)` is LightGBM's built-in
+  TreeSHAP, the same algorithm as `shap.TreeExplainer`. Using it keeps `shap` and `numba` out of the
+  runtime. `shap` is a dev dependency: a test checks the two give the same values (to 1e-6) and that
+  they add up to the model's raw margin. On the demo data the additivity error is ~1e-14.
+- **Integrated Gradients baseline = the median BENIGN training flow.** A zero baseline would mean
+  "every feature at the training mean", which is not a real flow. With the benign median, an
+  attribution reads as "how far this feature moved the decision away from typical normal traffic",
+  which matches the benign percentile shown beside it. The target is the predicted family's
+  logit, computed with 64 Gauss–Legendre steps. Completeness error is reported per run: the median
+  relative error was 0.1% on the demo data.
+- **Percentiles are mid-rank, and ports get a share instead.** About 40% of benign flows share some
+  values (often 0). Mid-rank puts such a value at the 20th percentile, not 0 or 40. A percentile
+  of a port number means nothing, so for `Destination Port` and `Protocol` the alert gives the share of
+  benign flows with that exact value ("port 21: <0.1% of normal traffic").
+- **Affected asset:** the destination if it is internal, otherwise the internal source (a bot
+  calling out). Unknown addresses get criticality 2: an unknown asset counts as sensitive until
+  someone says otherwise.
+- **Severity consequences, by design:** only a confident (≥ 0.9), high-impact (base 3) attack on a
+  business-critical asset is Critical, and a port scan never goes above Medium. A confident DDoS on
+  a standard workstation is Medium. That is debatable, but the table is tunable, documented and tested.
+- **`Alert` is frozen and `extra="forbid"`.** Nothing downstream, the LLM least of all, can change
+  family, confidence or severity. `LLM_FIELDS` is an explicit whitelist of what the Day 8
+  prompt may contain: no ground truth, no attack score, no source port. `provenance` (row id, flow id,
+  true label) is for evaluation only.
+- **Timestamps:** the CSVs use `d/m/yyyy h:mm` on a clock with no AM/PM, and capture ran during
+  working hours, so an hour below 8 is read as afternoon (3:30 → 15:30). The summary counts how
+  often this rule fired and how many timestamps failed to parse. *To check on the real files*
+  (the Days 1–3 open item).
+- **Plain JSON instead of `mitreattack-python`.** We need three object types and two relationship
+  types (~60 lines), and that library pulls in about twenty transitive dependencies (Excel, SVG,
+  TAXII). Same filters: revoked and deprecated objects are dropped, and so are revoked
+  relationships. The bundle is pinned to v20.1 and its SHA-256 is checked, so the KB cannot change
+  under us.
+- **Mapping verified against v20.1.** Every ID in `FAMILY_TECHNIQUES` exists and is active.
+  `verify_mapping` re-checks this on every `ae attack-kb`, so a later revocation fails the build.
+  `LABEL_EXPECTED_TECHNIQUES` lists which IDs are *correct* for each raw label; it is stricter than
+  the family table (XSS and SQL injection accept only T1190). Because the validator (Day 9) will
+  restrict explanations to the alert's allowed IDs, the share of alerts whose mapped techniques
+  include a correct one is the **ceiling** for the "correct ATT&CK technique" metric. The retrieval
+  check reports it (87% on the demo data, which has deliberate confusions).
+- **Ambiguous = Other-rare or calibrated confidence < 0.6.** Only then are embedding candidates
+  added, labelled `source="embedding"`. The embedding query is built from the family, the
+  port/service and the top features, and never contains IPs, hostnames or usernames.
+- **Two retrieval checks, one easy and one hard.** The easy query names the attack. The hard one
+  ("features only") gives just the port and the unusual flow statistics of that family's alerts, which
+  shows how little the fallback can infer from numbers alone. That is why it is only a fallback.
+- Fixed five misplaced `# fmt: skip` comments in `detect/compare.py` (ruff RUF028), which would
+  have failed CI's lint step.
+
+### Open
+- Run `make alerts` on the real data (after `make pipeline`), then copy the numbers into the README
+  and blueprint section 2: alert latency, MiniLM recall@3 and the correct-technique ceiling.
+- `uv.lock` needs regenerating (`uv lock`) for the new dependencies: faker, captum,
+  sentence-transformers, and dev-only shap.
+- Check the afternoon-timestamp rule against the real files (`timestamps_afternoon_rule` in the
+  alert summary should be roughly the share of afternoon alerts).

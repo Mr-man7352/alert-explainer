@@ -104,7 +104,7 @@ def comparison_markdown(
                 "Batch rows/s",
             ],
             rows,
-        )  # fmt: skip
+        )
     )
     parts += [
         "",
@@ -135,7 +135,7 @@ def comparison_markdown(
                 "Precision MLP",
             ],
             fam_rows,
-        )  # fmt: skip
+        )
     )
     parts += ["", "Held-out families (never trained on), share flagged as an attack:", ""]
     ho_rows = []
@@ -188,7 +188,7 @@ def comparison_markdown(
                     "Train time",
                 ],
                 ab_rows,
-            )  # fmt: skip
+            )
         )
 
     grid = (mlp.get("grid") or {}).get("results") or []
@@ -218,7 +218,7 @@ def comparison_markdown(
                     ]
                     for g in grid
                 ],
-            )  # fmt: skip
+            )
         )
 
     if cross_day:
@@ -251,7 +251,7 @@ def comparison_markdown(
                     "Thu–Fri BENIGN FPR",
                 ],
                 cd_rows,
-            )  # fmt: skip
+            )
         )
         labels = sorted(
             {lab for r in cross_day["models"].values() for lab in r["unseen_days"][key]["by_label"]}

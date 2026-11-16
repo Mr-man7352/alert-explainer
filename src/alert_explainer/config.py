@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     seed: int = 42
     # PyTorch device: auto (CUDA > MPS > CPU), cpu, mps or cuda. `ae bench-mlp` says which is faster.
     device: str = "auto"
+    # Day 7: sentence-transformers model for the ATT&CK embedding fallback (runs locally on CPU)
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
 
     @property
     def raw_dir(self) -> Path:
@@ -27,6 +29,10 @@ class Settings(BaseSettings):
     @property
     def processed_dir(self) -> Path:
         return self.data_dir / "processed"
+
+    @property
+    def attack_dir(self) -> Path:
+        return self.data_dir / "attack"
 
 
 def get_settings() -> Settings:

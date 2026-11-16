@@ -1,4 +1,4 @@
-.PHONY: setup lint format test db-up db-down etl split train-lgbm bench-mlp train-mlp cross-day compare pipeline demo
+.PHONY: setup lint format test db-up db-down etl split train-lgbm bench-mlp train-mlp cross-day compare pipeline demo inventory build-alerts severity-table attack-kb retrieval-check alerts
 
 setup:            ## install deps and git hooks
 	uv sync
@@ -50,3 +50,21 @@ cross-day:
 
 compare:
 	uv run ae compare
+
+inventory:        ## Day 6: synthetic asset inventory -> data/inventory.csv
+	uv run ae inventory
+
+build-alerts:     ## Day 6: 100 alerts from each model -> data/alerts/, reports/alerts_summary_*.json
+	uv run ae build-alerts --model lgbm
+	uv run ae build-alerts --model mlp
+
+severity-table:   ## Day 6: docs/severity_rules.md
+	uv run ae severity-table
+
+attack-kb:        ## Day 7: pinned ATT&CK STIX download + parse -> data/attack/kb.json
+	uv run ae attack-kb
+
+retrieval-check:  ## Day 7: reports/retrieval_check.md (downloads MiniLM once from Hugging Face)
+	uv run ae retrieval-check
+
+alerts: inventory build-alerts severity-table attack-kb retrieval-check

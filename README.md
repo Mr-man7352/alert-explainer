@@ -8,9 +8,12 @@ English at two levels: a short **manager view** (what happened, how serious, wha
 before the LLM sees them, the API is authenticated and role-based, every action is audit-logged, and a
 prompt-injection suite runs in CI.
 
-> **Status (15 Nov 2026):** Days 1–5 done: repo, data pipeline, LightGBM baseline, PyTorch MLP with
-> tuning and a focal-loss ablation, cross-day robustness test, model comparison and model cards.
-> Explanation, privacy and API layers follow (see `docs/devlog.md`).
+> **Status (16 Nov 2026):** Days 1–7 done: repo, data pipeline, LightGBM baseline, PyTorch MLP with
+> tuning and a focal-loss ablation, cross-day robustness test, model comparison and model cards;
+> synthetic asset inventory, deterministic severity, per-alert SHAP / Integrated Gradients
+> attributions and the `Alert` builder; a pinned MITRE ATT&CK knowledge base with a verified
+> family → technique mapping and an embedding fallback. The LLM, privacy and API layers follow
+> (see `docs/devlog.md`).
 
 ## Design principles
 
@@ -41,6 +44,7 @@ make db-up                      # PostgreSQL 16 on localhost
 scripts/get_data.sh ~/Downloads/GeneratedLabelledFlows.zip
 make bench-mlp                  # which PyTorch device is faster here (CPU or Apple MPS)?
 make pipeline                   # ETL → splits → LightGBM → MLP → cross-day → comparison
+make alerts                     # Days 6–7: inventory, 100 alerts, ATT&CK KB, retrieval check
 ```
 
 | Command | Output |
@@ -54,6 +58,11 @@ make pipeline                   # ETL → splits → LightGBM → MLP → cross-
 | `uv run ae train-mlp` | 7-config grid, then CE vs focal on all rows → `models/mlp/`, `reports/mlp_metrics.json`, `reports/figures/mlp_*.png` |
 | `uv run ae cross-day` | Train on Mon–Wed, test on unseen Thu–Fri attacks → `reports/cross_day.json`, `reports/figures/cross_day_detection.png` |
 | `uv run ae compare` | `reports/model_comparison.md`, `models/lgbm/model_card.md`, `models/mlp/model_card.md` |
+| `uv run ae inventory` | `data/inventory.csv`: a **synthetic** hostname, owner, department and criticality per internal IP |
+| `uv run ae build-alerts` | 100 alerts from the test set (`--model lgbm` or `mlp`) → `data/alerts/alerts_<model>.json`, `reports/alerts_summary_<model>.json` |
+| `uv run ae severity-table` | `docs/severity_rules.md`: the deterministic severity rule and every combination |
+| `uv run ae attack-kb` | Downloads Enterprise ATT&CK v20.1 (pinned, SHA-256 checked) → `data/attack/kb.json`; fails if a mapped technique is missing or revoked |
+| `uv run ae retrieval-check` | `reports/retrieval_check.md`: mapping table, embedding retrieval (MiniLM and TF-IDF), and the built alerts |
 
 ## Troubleshooting
 
@@ -89,12 +98,15 @@ models: trained on Mon–Wed only, a detector meets every Thu–Fri attack type 
 
 ```
 src/alert_explainer/
-  data/     labels.py  etl.py  data_card.py  splits.py  synthetic.py
+  data/     labels.py  etl.py  data_card.py  splits.py  synthetic.py  inventory.py
   detect/   data.py  lgbm.py  torch_mlp.py  train_mlp.py  cross_day.py  compare.py  evaluate.py
-            (severity, attribution: Day 6)
-  explain/  privacy/  api/  ui/             (Days 7–13)
-tests/unit/                                  ETL, labels, splits, LightGBM, MLP, cross-day, comparison
-docs/       devlog.md  data_card.md
+            severity.py  attribution.py  detectors.py  alerts.py
+  explain/  schemas.py  attack_kb.py  retrieve.py  retrieval_check.py
+            (prompts, LLM, validator, fallback: Days 8–9)
+  privacy/  api/  ui/                       (Days 10–13)
+tests/unit/                                  ETL, labels, splits, LightGBM, MLP, cross-day, comparison,
+                                             severity, inventory, attribution, alerts, ATT&CK KB, retrieval
+docs/       devlog.md  data_card.md  severity_rules.md
 ```
 
 ## Data
@@ -102,3 +114,6 @@ docs/       devlog.md  data_card.md
 CIC-IDS2017 (Sharafaldin, Lashkari & Ghorbani, 2018), Canadian Institute for Cybersecurity, UNB. Public
 research data; any hostnames and usernames in this project are **synthetic**. Known labelling problems in
 the original release are documented in `docs/data_card.md`.
+
+MITRE ATT&CK® Enterprise v20.1 (STIX 2.1, from MITRE's `attack-stix-data` repository), © The MITRE
+Corporation, used under MITRE's terms of use. It is downloaded by `ae attack-kb` and not stored in the repo.

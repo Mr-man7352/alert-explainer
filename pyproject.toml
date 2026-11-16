@@ -20,6 +20,11 @@ dependencies = [
     "pydantic-settings>=2.6",
     "scipy>=1.13",
     "torch>=2.5",
+    # Day 6: synthetic inventory, Integrated Gradients for the MLP
+    "faker>=30",
+    "captum>=0.8",
+    # Day 7: local embeddings for the ATT&CK fallback retrieval
+    "sentence-transformers>=3.3",
 ]
 
 [project.scripts]
@@ -33,6 +38,7 @@ dev = [
     "ruff>=0.8",
     "mypy>=1.13",
     "pre-commit>=4.0",
+    "shap>=0.46",  # test-only: checks LightGBM's built-in TreeSHAP against shap.TreeExplainer
 ]
 
 # Linux (CI, Docker) gets the CPU-only PyTorch wheel: the default PyPI wheel pulls ~3 GB of CUDA
