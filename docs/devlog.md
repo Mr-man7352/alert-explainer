@@ -60,3 +60,78 @@ The blueprint planned Days 1–3 for 12–14 Nov; all three were built on the 14
 - Run `make pipeline` on the real data and copy the numbers into the README and section 2 of the
   blueprint.
 - Check the real files' timestamp format before Day 6 (alert builder).
+
+## Days 4–5 (built Sun 15 Nov 2026)
+
+### Built
+- **Day 4, PyTorch MLP** (`detect/torch_mlp.py`, `detect/train_mlp.py`): `FlowPreprocessor` (quantile
+  transform to a normal distribution, fitted on train only). Train/val/test arrays are exported to
+  `data/processed/mlp/*.npy` and read as memory maps by a custom `FlowDataset`. The `MLP` is
+  70 → 256 → 128 → 64 → 7 with BatchNorm, ReLU and Dropout 0.2, about 60k parameters. The training
+  loop is hand-written: AdamW, OneCycle LR, class-weighted cross-entropy, and early stopping
+  (patience 4) on validation macro-F1, restoring the best epoch. The device is picked
+  automatically (CUDA > MPS > CPU); `ae bench-mlp` times both CPU and MPS so the faster can be set
+  in `AE_DEVICE`.
+- **Day 5, tuning and evaluation:** a 7-config grid (learning rate, dropout, class weighting, width) on all attack rows
+  plus 300k sampled BENIGN rows. Then two final runs on the full training set: the best config with
+  cross-entropy, and the same config with **focal loss (γ = 2)** as a controlled ablation.
+  `ae cross-day` runs the unseen-attack test for both LightGBM and the MLP. `ae compare` writes
+  `reports/model_comparison.md` plus generated model cards for both models.
+- `detect/data.py`: one loader for the new code that turns split columns into boolean masks inside
+  Polars, with no 2.5M-row arrays of Python strings.
+- 21 new tests (50 in total): Dataset/loader batching and reproducibility, focal loss = weighted CE at
+  γ = 0, class weights equal LightGBM's row weights, the fast preprocessor matches sklearn, save/load
+  round trip, and end-to-end `train-mlp`, `cross-day` and `compare` on the synthetic data.
+
+### Decisions
+- **Same treatment as LightGBM, so the comparison is fair.** The MLP uses the same split, the
+  same isotonic calibration on the `cal` half of validation, the same threshold rule and decision
+  rule, the same metric code and the same class-weighting schemes. The only differences are the
+  model and its preprocessing.
+- **No `log1p` before the quantile transform** (the blueprint had both). A quantile transform is
+  rank-based, so any monotone transform before it changes nothing. It also copes with the
+  `-1` values in `Init_Win_bytes_*`, which `log1p` would not.
+- **A batch-level `__getitems__` instead of per-row `__getitem__`.** With 1.76M rows, 2,048 Python
+  calls per batch would cost more than the forward pass. Indices are sorted inside each batch so
+  memory-map reads are sequential, and `drop_last=True` stops BatchNorm meeting a batch of 1.
+  `num_workers=0`, because macOS spawns worker processes slowly.
+- **Our own `transform` for the quantile transformer.** sklearn's took **11 ms for a single row**
+  (per-call overhead in `scipy.stats.norm.ppf`), against 0.07 ms for the network itself. That would
+  have made the MLP's per-alert latency ~20× LightGBM's for no real reason. The replacement uses the
+  same algorithm (two-way interpolation, the same float32 bound checks, `ndtri`, the same
+  clipping), is unit-tested to match sklearn to 1e-6, and brings preprocessing under 1 ms. Fitting
+  still uses sklearn.
+- **Focal loss is selected on validation, never on test.** Both variants are reported on test.
+- **OneCycle plus early stopping: fixed after the first real run.** The first full run used
+  patience 4 with a 30-epoch OneCycle schedule. Every run stopped at epochs 6–11, while the learning
+  rate was still at its peak (0.003; OneCycle warms up for the first 30% of epochs). Validation macro-F1
+  jumped by ±0.1 between epochs (0.79 → 0.93 → 0.79), the model never annealed, and the grid ranked
+  configs on unfinished runs. Result: test macro-F1 0.929 vs LightGBM's 0.972, all of the gap in Bot
+  (F1 0.57 vs 0.81); the other six families were 0.96–1.00. Fix: run the full schedule (now 20
+  epochs) and keep the best epoch; if patience is set, it only counts after the learning-rate peak.
+  This costs about 1.5 extra minutes per full-data run. Lesson: early stopping assumes a decaying
+  learning rate.
+- **Cross-day test, binary.** No attack family is present on both sides of the day split, so the
+  detectors are retrained as attack-vs-BENIGN on Mon–Wed (85/15 for early stopping and threshold).
+  On Thu–Fri every attack type is unseen. The MLP's quantile transform is refitted on Mon–Wed rows
+  only, so nothing from Thu–Fri leaks in. Reported: per-label share flagged, Thu–Fri BENIGN FPR (how
+  far normal traffic drifts) and AUROC.
+- **CPU-only PyTorch on Linux** (`[tool.uv.sources]` in `pyproject.toml`), so CI and Docker don't
+  download ~3 GB of CUDA libraries. macOS uses the normal wheel, which includes MPS.
+- **Day 6 interface ready:** `train_mlp.MLPDetector` loads weights, preprocessor, calibrator and
+  threshold, and maps raw features to (family, calibrated probabilities). Weights load with
+  `torch.load(weights_only=True)`, so no pickled code runs.
+
+### First real-data cross-day result (Mon–Wed → Thu–Fri, threshold for BENIGN FPR ≤ 1% on Mon–Wed)
+- LightGBM: Thu–Fri AUROC 0.859, 60.1% of unseen attacks flagged. The MLP (before the fix above):
+  AUROC 0.847, 50.5%. BENIGN FPR rose to 1.48% / 1.13% on the new days: normal traffic drifts too.
+- **Unseen attacks that resemble seen ones are caught; quiet ones are not.** DDoS (like the Wednesday
+  DoS floods) 100% / 84%; the web attacks (brute force, XSS and SQL injection, like the Tuesday
+  Patator brute force and the DoS traffic on port 80) 90–100%. PortScan was 3–4%, Bot 0% and
+  Infiltration 0%: low-volume traffic that looks like normal connections. The detection rate on the
+  random split (99.96%) says nothing about unseen attack types.
+
+### Open
+- Re-run `make train-mlp cross-day compare` with the schedule fix, and copy the numbers
+  into the README results table and section 2 of the blueprint.
+- Day 6: SHAP for LightGBM and Captum Integrated Gradients for the MLP, against the deployed model.

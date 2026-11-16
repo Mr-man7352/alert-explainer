@@ -8,8 +8,9 @@ English at two levels: a short **manager view** (what happened, how serious, wha
 before the LLM sees them, the API is authenticated and role-based, every action is audit-logged, and a
 prompt-injection suite runs in CI.
 
-> **Status (15 Nov 2026):** Days 1–3 done: repo, data pipeline, LightGBM baseline.
-> Detection, explanation, privacy and API layers follow (see `docs/devlog.md`).
+> **Status (15 Nov 2026):** Days 1–5 done: repo, data pipeline, LightGBM baseline, PyTorch MLP with
+> tuning and a focal-loss ablation, cross-day robustness test, model comparison and model cards.
+> Explanation, privacy and API layers follow (see `docs/devlog.md`).
 
 ## Design principles
 
@@ -38,7 +39,8 @@ make db-up                      # PostgreSQL 16 on localhost
 # real data: download GeneratedLabelledFlows.zip (TrafficLabelling CSVs) from
 # https://www.unb.ca/cic/datasets/ids-2017.html, then
 scripts/get_data.sh ~/Downloads/GeneratedLabelledFlows.zip
-make pipeline                   # ETL → splits → LightGBM
+make bench-mlp                  # which PyTorch device is faster here (CPU or Apple MPS)?
+make pipeline                   # ETL → splits → LightGBM → MLP → cross-day → comparison
 ```
 
 | Command | Output |
@@ -47,6 +49,11 @@ make pipeline                   # ETL → splits → LightGBM
 | `uv run ae split` | `data/processed/splits.parquet`, `reports/splits_summary.json` |
 | `uv run ae train-lgbm` | `models/lgbm/`, `reports/lgbm_metrics.json`, `reports/figures/lgbm_*.png` |
 | `uv run ae train-lgbm --grid quick` | One config instead of eight (fast check) |
+| `uv run ae bench-mlp` | Seconds per MLP epoch on each device; set `AE_DEVICE` in `.env` to the fastest |
+| `uv run ae train-mlp --grid none --no-ablation` | One MLP run with the default config (Day 4 check) |
+| `uv run ae train-mlp` | 7-config grid, then CE vs focal on all rows → `models/mlp/`, `reports/mlp_metrics.json`, `reports/figures/mlp_*.png` |
+| `uv run ae cross-day` | Train on Mon–Wed, test on unseen Thu–Fri attacks → `reports/cross_day.json`, `reports/figures/cross_day_detection.png` |
+| `uv run ae compare` | `reports/model_comparison.md`, `models/lgbm/model_card.md`, `models/mlp/model_card.md` |
 
 ## Troubleshooting
 
@@ -67,24 +74,26 @@ Test set: 378,148 flows, never used for training or tuning.
 
 | Metric | LightGBM | PyTorch MLP |
 |---|---|---|
-| Macro-F1 (7 families) | **0.972** | _Day 4–5_ |
+| Macro-F1 (7 families) | **0.972** | _run `make train-mlp`_ |
 | BENIGN false-positive rate at the chosen threshold | **0.10%** | |
 | Attacks detected (any family) | **99.96%** | |
 | Median detection latency per alert | 0.49 ms | |
 | Rows after cleaning | 2,521,028 (from 2,830,743) | |
 
 Per-family results, the threshold curve and held-out Heartbleed/Infiltration detection are in
-`reports/lgbm_metrics.json`; figures are in `reports/figures/`. Random splits flatter IDS models (see
-`docs/data_card.md`); the cross-day test comes on Day 5.
+`reports/lgbm_metrics.json`; figures are in `reports/figures/`. The full LightGBM vs MLP comparison,
+the loss ablation and the cross-day test are in `reports/model_comparison.md`. Random splits flatter IDS
+models: trained on Mon–Wed only, a detector meets every Thu–Fri attack type for the first time.
 
 ## Layout
 
 ```
 src/alert_explainer/
   data/     labels.py  etl.py  data_card.py  splits.py  synthetic.py
-  detect/   lgbm.py  evaluate.py            (torch_mlp, severity, attribution: Days 4–6)
+  detect/   data.py  lgbm.py  torch_mlp.py  train_mlp.py  cross_day.py  compare.py  evaluate.py
+            (severity, attribution: Day 6)
   explain/  privacy/  api/  ui/             (Days 7–13)
-tests/unit/                                  ETL, labels, splits, LightGBM
+tests/unit/                                  ETL, labels, splits, LightGBM, MLP, cross-day, comparison
 docs/       devlog.md  data_card.md
 ```
 

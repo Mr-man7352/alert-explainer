@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     reports_dir: Path = PROJECT_ROOT / "reports"
     docs_dir: Path = PROJECT_ROOT / "docs"
     seed: int = 42
+    # PyTorch device: auto (CUDA > MPS > CPU), cpu, mps or cuda. `ae bench-mlp` says which is faster.
+    device: str = "auto"
 
     @property
     def raw_dir(self) -> Path:

@@ -18,6 +18,8 @@ dependencies = [
     "joblib>=1.4",
     "pydantic>=2.9",
     "pydantic-settings>=2.6",
+    "scipy>=1.13",
+    "torch>=2.5",
 ]
 
 [project.scripts]
@@ -32,6 +34,16 @@ dev = [
     "mypy>=1.13",
     "pre-commit>=4.0",
 ]
+
+# Linux (CI, Docker) gets the CPU-only PyTorch wheel: the default PyPI wheel pulls ~3 GB of CUDA
+# libraries. macOS uses the normal PyPI wheel, which includes Apple's MPS backend.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [build-system]
 requires = ["hatchling"]

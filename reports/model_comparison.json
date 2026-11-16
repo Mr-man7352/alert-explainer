@@ -1,0 +1,61 @@
+{
+  "lgbm": {
+    "macro_f1": 0.9716,
+    "macro_f1_attacks_only": 0.9669,
+    "benign_fpr": 0.00098,
+    "attack_detection_rate": 0.9996,
+    "brier": 0.00148,
+    "threshold": 0.22,
+    "f1_by_family": {
+      "BENIGN": 0.9995,
+      "DoS": 0.9987,
+      "DDoS": 0.9999,
+      "PortScan": 0.9948,
+      "BruteForce": 1.0,
+      "WebAttack": 0.9953,
+      "Bot": 0.813
+    },
+    "training_seconds_final_fit": 156.4,
+    "latency": {
+      "single_alert_median_ms": 0.487,
+      "single_alert_p95_ms": 0.535,
+      "batch_rows_per_second": 53460
+    }
+  },
+  "mlp": {
+    "macro_f1": 0.9338,
+    "macro_f1_attacks_only": 0.9229,
+    "benign_fpr": 0.00105,
+    "attack_detection_rate": 0.9949,
+    "brier": 0.00266,
+    "threshold": 0.4975795149803162,
+    "f1_by_family": {
+      "BENIGN": 0.999,
+      "DoS": 0.9958,
+      "DDoS": 0.9998,
+      "PortScan": 0.9947,
+      "BruteForce": 0.9949,
+      "WebAttack": 0.9585,
+      "Bot": 0.5939
+    },
+    "training_seconds_final_fit": 90.4,
+    "latency": {
+      "device": "cpu",
+      "single_alert_median_ms": 1.717,
+      "single_alert_p95_ms": 2.176,
+      "batch_rows_per_second": 74148
+    }
+  },
+  "cross_day": {
+    "lgbm": {
+      "thu_fri_auroc": 0.8586,
+      "thu_fri_detection": 0.6011,
+      "thu_fri_benign_fpr": 0.01482
+    },
+    "mlp": {
+      "thu_fri_auroc": 0.859,
+      "thu_fri_detection": 0.4089,
+      "thu_fri_benign_fpr": 0.01042
+    }
+  }
+}

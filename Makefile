@@ -1,4 +1,4 @@
-.PHONY: setup lint format test db-up db-down etl split train-lgbm pipeline demo
+.PHONY: setup lint format test db-up db-down etl split train-lgbm bench-mlp train-mlp cross-day compare pipeline demo
 
 setup:            ## install deps and git hooks
 	uv sync
@@ -34,7 +34,19 @@ split:            ## Day 3: stratified 70/15/15 + cross-day split
 train-lgbm:       ## Day 3: LightGBM baseline -> models/lgbm + reports/lgbm_metrics.json
 	uv run ae train-lgbm
 
-pipeline: etl split train-lgbm
+pipeline: etl split train-lgbm train-mlp cross-day compare
 
 demo:             ## whole pipeline on small synthetic data in data/demo (no download needed)
 	uv run ae demo
+
+bench-mlp:
+	uv run ae bench-mlp
+
+train-mlp:
+	uv run ae train-mlp
+
+cross-day:
+	uv run ae cross-day
+
+compare:
+	uv run ae compare
