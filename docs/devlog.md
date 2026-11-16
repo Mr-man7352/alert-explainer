@@ -193,10 +193,12 @@ The blueprint planned Day 6 for 17 Nov and Day 7 for 18 Nov; both were built on 
   family, confidence or severity. `LLM_FIELDS` is an explicit whitelist of what the Day 8
   prompt may contain: no ground truth, no attack score, no source port. `provenance` (row id, flow id,
   true label) is for evaluation only.
-- **Timestamps:** the CSVs use `d/m/yyyy h:mm` on a clock with no AM/PM, and capture ran during
-  working hours, so an hour below 8 is read as afternoon (3:30 → 15:30). The summary counts how
-  often this rule fired and how many timestamps failed to parse. *To check on the real files*
-  (the Days 1–3 open item).
+- **Timestamps, checked on the real data (closes the Days 1–3 open item).** Tuesday–Friday use
+  `d/m/yyyy h:mm`; Monday uses `dd/mm/yyyy hh:mm:ss`. No file has AM/PM, and the hours seen are 8–12
+  and 1–5 only (none at 6, 7 or 13+): a 12-hour clock with no marker. So an hour below 8 is read as
+  afternoon (3:30 → 15:30). This matches the published attack schedule: Friday's DDoS appears at
+  hours 3–4, i.e. about 15:56–16:16. The alert summary counts how often the rule fired and how many
+  timestamps failed to parse.
 - **Plain JSON instead of `mitreattack-python`.** We need three object types and two relationship
   types (~60 lines), and that library pulls in about twenty transitive dependencies (Excel, SVG,
   TAXII). Same filters: revoked and deprecated objects are dropped, and so are revoked
@@ -227,5 +229,3 @@ The blueprint planned Day 6 for 17 Nov and Day 7 for 18 Nov; both were built on 
   and blueprint section 2: alert latency, MiniLM recall@3 and the correct-technique ceiling.
 - `uv.lock` needs regenerating (`uv lock`) for the new dependencies: faker, captum,
   sentence-transformers, and dev-only shap.
-- Check the afternoon-timestamp rule against the real files (`timestamps_afternoon_rule` in the
-  alert summary should be roughly the share of afternoon alerts).
