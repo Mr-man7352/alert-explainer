@@ -81,17 +81,46 @@ Long-term fix: install native Homebrew (it lives in `/opt/homebrew`) and run `br
 
 Test set: 378,148 flows, never used for training or tuning.
 
+**Detection** (Days 3–5)
+
 | Metric | LightGBM | PyTorch MLP |
 |---|---|---|
-| Macro-F1 (7 families) | **0.972** | _run `make train-mlp`_ |
-| BENIGN false-positive rate at the chosen threshold | **0.10%** | |
-| Attacks detected (any family) | **99.96%** | |
-| Median detection latency per alert | 0.49 ms | |
+| Macro-F1 (7 families) | **0.972** | 0.934 |
+| BENIGN false-positive rate at the chosen threshold | **0.10%** | 0.11% |
+| Attacks detected (any family) | **99.96%** | 99.49% |
+| Weakest family (Bot) F1 | 0.813 | 0.594 |
+| Cross-day: unseen Thu–Fri attacks detected / AUROC | 60.1% / 0.859 | 40.9% / 0.859 |
+| Median detection latency per alert (CPU) | 0.49 ms | 1.72 ms |
 | Rows after cleaning | 2,521,028 (from 2,830,743) | |
+
+**Alerts** (Days 6–7): 100 alerts per model, sampled from the test set's flagged flows and stratified
+by predicted family (16–17 each), so rare families are represented. Because of the stratification,
+the shares below describe the sample, not the detector's overall error rates.
+
+| Metric | LightGBM | PyTorch MLP |
+|---|---|---|
+| Median / p95 latency per alert: detection, calibration, attribution, severity, validation | 37.0 / 50.5 ms | 10.6 / 18.7 ms |
+| Attribution check | SHAP additivity error 4e-14 | IG completeness error 0.6% (median) |
+| Severity: Critical / High / Medium / Low | 33 / 37 / 28 / 2 | 31 / 36 / 26 / 7 |
+| Sampled alerts that are really BENIGN | 4 | 10 |
+| Affected asset found in the (synthetic) inventory | 100% | 100% |
+
+**ATT&CK grounding** (Day 7, Enterprise ATT&CK v20.1, 706 techniques; on the LightGBM alerts)
+
+| Metric | Value |
+|---|---|
+| Alerts whose mapped techniques include a correct one for the true label | **96%** (all 96 true attacks; the other 4 are BENIGN false positives) |
+| Embedding fallback, MiniLM: recall@3 with an attack description / from flow features only | 0.86 / 0.17 |
+| Embedding fallback, TF-IDF baseline: same | 0.57 / 0.17 |
+| Alerts ambiguous enough to get embedding candidates (confidence < 0.6) | 2 of 100 |
+
+The deterministic mapping table does the real work. Retrieved from the flow statistics alone, the
+embedding fallback rarely finds the right technique, which is why it only *adds* labelled candidates.
 
 Per-family results, the threshold curve and held-out Heartbleed/Infiltration detection are in
 `reports/lgbm_metrics.json`; figures are in `reports/figures/`. The full LightGBM vs MLP comparison,
-the loss ablation and the cross-day test are in `reports/model_comparison.md`. Random splits flatter IDS
+the loss ablation and the cross-day test are in `reports/model_comparison.md`. Alert statistics are in
+`reports/alerts_summary_<model>.json`, and the ATT&CK check in `reports/retrieval_check.md`. Random splits flatter IDS
 models: trained on Mon–Wed only, a detector meets every Thu–Fri attack type for the first time.
 
 ## Layout

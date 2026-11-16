@@ -1,0 +1,1142 @@
+{
+  "generated_at": "2026-11-16T21:08:11+00:00",
+  "kb": {
+    "attack_version": "20.1",
+    "domain": "enterprise-attack",
+    "source": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack-20.1.json",
+    "bundle_sha256": "539a843a7b53ed9749740b2123dddae3726b1a4831841c32aca740b011b910b5",
+    "n_techniques": 706,
+    "n_subtechniques": 479,
+    "generated_at": "2026-11-16T21:07:39+00:00",
+    "license_note": "ATT&CK\u00ae content \u00a9 The MITRE Corporation, reproduced under MITRE's terms of use (https://attack.mitre.org/resources/legal-and-branding/terms-of-use/)."
+  },
+  "mapping": {
+    "DoS": {
+      "reason": "Hulk/GoldenEye flood a web server with HTTP requests and slowloris/Slowhttptest hold its connections open: denial of service against a service on one endpoint (Service Exhaustion Flood).",
+      "techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "impact"
+          ],
+          "n_mitigations": 1,
+          "mitigations": [
+            "Filter Network Traffic"
+          ],
+          "detection_strategies": [
+            "Endpoint Resource Saturation and Crash Pattern Detection Across Platforms"
+          ]
+        },
+        {
+          "id": "T1499.002",
+          "name": "Service Exhaustion Flood",
+          "tactics": [
+            "impact"
+          ],
+          "n_mitigations": 1,
+          "mitigations": [
+            "Filter Network Traffic"
+          ],
+          "detection_strategies": [
+            "Detection Strategy for Endpoint DoS via Service Exhaustion Flood"
+          ]
+        }
+      ]
+    },
+    "DDoS": {
+      "reason": "LOIC traffic from several sources saturates the target's network capacity (Network Denial of Service, Direct Network Flood).",
+      "techniques": [
+        {
+          "id": "T1498",
+          "name": "Network Denial of Service",
+          "tactics": [
+            "impact"
+          ],
+          "n_mitigations": 1,
+          "mitigations": [
+            "Filter Network Traffic"
+          ],
+          "detection_strategies": [
+            "Behavioral Detection of T1498 \u2013 Network Denial of Service Across Platforms"
+          ]
+        },
+        {
+          "id": "T1498.001",
+          "name": "Direct Network Flood",
+          "tactics": [
+            "impact"
+          ],
+          "n_mitigations": 1,
+          "mitigations": [
+            "Filter Network Traffic"
+          ],
+          "detection_strategies": [
+            "Direct Network Flood Detection across IaaS, Linux, Windows, and macOS"
+          ]
+        }
+      ]
+    },
+    "PortScan": {
+      "reason": "nmap probes many ports to find listening services (Network Service Discovery).",
+      "techniques": [
+        {
+          "id": "T1046",
+          "name": "Network Service Discovery",
+          "tactics": [
+            "discovery"
+          ],
+          "n_mitigations": 3,
+          "mitigations": [
+            "Network Segmentation",
+            "Network Intrusion Prevention",
+            "Disable or Remove Feature or Program"
+          ],
+          "detection_strategies": [
+            "Behavioral Detection Strategy for Network Service Discovery Across Platforms"
+          ]
+        }
+      ]
+    },
+    "BruteForce": {
+      "reason": "FTP-Patator and SSH-Patator try many passwords against a login service (Brute Force: Password Guessing).",
+      "techniques": [
+        {
+          "id": "T1110",
+          "name": "Brute Force",
+          "tactics": [
+            "credential-access"
+          ],
+          "n_mitigations": 4,
+          "mitigations": [
+            "User Account Management",
+            "Password Policies",
+            "Multi-factor Authentication"
+          ],
+          "detection_strategies": [
+            "Brute Force Authentication Failures with Multi-Platform Log Correlation"
+          ]
+        },
+        {
+          "id": "T1110.001",
+          "name": "Password Guessing",
+          "tactics": [
+            "credential-access"
+          ],
+          "n_mitigations": 4,
+          "mitigations": [
+            "Password Policies",
+            "Multi-factor Authentication",
+            "Account Use Policies"
+          ],
+          "detection_strategies": [
+            "Password Guessing via Multi-Source Authentication Failure Correlation"
+          ]
+        }
+      ]
+    },
+    "WebAttack": {
+      "reason": "SQL injection and XSS exploit the public web application (Exploit Public-Facing Application); the web brute-force variant guesses its login (Password Guessing).",
+      "techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "tactics": [
+            "initial-access"
+          ],
+          "n_mitigations": 8,
+          "mitigations": [
+            "Vulnerability Scanning",
+            "Privileged Account Management",
+            "Network Segmentation"
+          ],
+          "detection_strategies": [
+            "Exploit Public-Facing Application \u2013 multi-signal correlation (request \u2192 error \u2192 post-exploit process/egress)"
+          ]
+        },
+        {
+          "id": "T1110.001",
+          "name": "Password Guessing",
+          "tactics": [
+            "credential-access"
+          ],
+          "n_mitigations": 4,
+          "mitigations": [
+            "Password Policies",
+            "Multi-factor Authentication",
+            "Account Use Policies"
+          ],
+          "detection_strategies": [
+            "Password Guessing via Multi-Source Authentication Failure Correlation"
+          ]
+        }
+      ]
+    },
+    "Bot": {
+      "reason": "Ares bots poll their controller over HTTP (Application Layer Protocol: Web Protocols).",
+      "techniques": [
+        {
+          "id": "T1071",
+          "name": "Application Layer Protocol",
+          "tactics": [
+            "command-and-control"
+          ],
+          "n_mitigations": 2,
+          "mitigations": [
+            "Network Intrusion Prevention",
+            "Filter Network Traffic"
+          ],
+          "detection_strategies": [
+            "Detection of Command and Control Over Application Layer Protocols"
+          ]
+        },
+        {
+          "id": "T1071.001",
+          "name": "Web Protocols",
+          "tactics": [
+            "command-and-control"
+          ],
+          "n_mitigations": 2,
+          "mitigations": [
+            "Network Intrusion Prevention",
+            "Filter Network Traffic"
+          ],
+          "detection_strategies": [
+            "Detection of Web Protocol-Based C2 Over HTTP, HTTPS, or WebSockets"
+          ]
+        }
+      ]
+    },
+    "Other-rare": {
+      "reason": "Heartbleed exploits a public-facing TLS service (T1190). Infiltration starts with a victim opening a malicious file (User Execution) and continues with an internal network scan (T1046). Never trained on: alerts are rare and retrieval falls back to embeddings.",
+      "techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "tactics": [
+            "initial-access"
+          ],
+          "n_mitigations": 8,
+          "mitigations": [
+            "Vulnerability Scanning",
+            "Privileged Account Management",
+            "Network Segmentation"
+          ],
+          "detection_strategies": [
+            "Exploit Public-Facing Application \u2013 multi-signal correlation (request \u2192 error \u2192 post-exploit process/egress)"
+          ]
+        },
+        {
+          "id": "T1204",
+          "name": "User Execution",
+          "tactics": [
+            "execution"
+          ],
+          "n_mitigations": 6,
+          "mitigations": [
+            "User Training",
+            "Restrict Web-Based Content",
+            "Network Intrusion Prevention"
+          ],
+          "detection_strategies": [
+            "User Execution \u2013 multi-surface behavior chain (documents/links \u2192 helper/unpacker \u2192 LOLBIN/child \u2192 egress)"
+          ]
+        },
+        {
+          "id": "T1046",
+          "name": "Network Service Discovery",
+          "tactics": [
+            "discovery"
+          ],
+          "n_mitigations": 3,
+          "mitigations": [
+            "Network Segmentation",
+            "Network Intrusion Prevention",
+            "Disable or Remove Feature or Program"
+          ],
+          "detection_strategies": [
+            "Behavioral Detection Strategy for Network Service Discovery Across Platforms"
+          ]
+        }
+      ]
+    }
+  },
+  "all_mapped_ids_resolve": true,
+  "embedding": {
+    "minilm": {
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "family_description": {
+        "per_family": {
+          "DoS": {
+            "query": "Network traffic resembling a denial-of-service flood of requests exhausting a single server's service.",
+            "rank_of_mapped_technique": 1,
+            "top5": [
+              {
+                "id": "T1499.002",
+                "name": "Service Exhaustion Flood",
+                "similarity": 0.738
+              },
+              {
+                "id": "T1498",
+                "name": "Network Denial of Service",
+                "similarity": 0.684
+              },
+              {
+                "id": "T1499.001",
+                "name": "OS Exhaustion Flood",
+                "similarity": 0.642
+              },
+              {
+                "id": "T1499.003",
+                "name": "Application Exhaustion Flood",
+                "similarity": 0.637
+              },
+              {
+                "id": "T1498.001",
+                "name": "Direct Network Flood",
+                "similarity": 0.636
+              }
+            ]
+          },
+          "DDoS": {
+            "query": "Network traffic resembling a distributed denial-of-service flood saturating the target's network bandwidth.",
+            "rank_of_mapped_technique": 1,
+            "top5": [
+              {
+                "id": "T1498",
+                "name": "Network Denial of Service",
+                "similarity": 0.697
+              },
+              {
+                "id": "T1498.001",
+                "name": "Direct Network Flood",
+                "similarity": 0.682
+              },
+              {
+                "id": "T1499.002",
+                "name": "Service Exhaustion Flood",
+                "similarity": 0.668
+              },
+              {
+                "id": "T1499.001",
+                "name": "OS Exhaustion Flood",
+                "similarity": 0.603
+              },
+              {
+                "id": "T1499.003",
+                "name": "Application Exhaustion Flood",
+                "similarity": 0.569
+              }
+            ]
+          },
+          "PortScan": {
+            "query": "Network traffic resembling a port scan probing many ports to discover listening network services.",
+            "rank_of_mapped_technique": 3,
+            "top5": [
+              {
+                "id": "T1040",
+                "name": "Network Sniffing",
+                "similarity": 0.568
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.54
+              },
+              {
+                "id": "T1046",
+                "name": "Network Service Discovery",
+                "similarity": 0.538
+              },
+              {
+                "id": "T1049",
+                "name": "System Network Connections Discovery",
+                "similarity": 0.523
+              },
+              {
+                "id": "T1205.001",
+                "name": "Port Knocking",
+                "similarity": 0.516
+              }
+            ]
+          },
+          "BruteForce": {
+            "query": "Network traffic resembling repeated login attempts guessing passwords against an authentication service.",
+            "rank_of_mapped_technique": 1,
+            "top5": [
+              {
+                "id": "T1110.001",
+                "name": "Password Guessing",
+                "similarity": 0.593
+              },
+              {
+                "id": "T1110.003",
+                "name": "Password Spraying",
+                "similarity": 0.553
+              },
+              {
+                "id": "T1110",
+                "name": "Brute Force",
+                "similarity": 0.548
+              },
+              {
+                "id": "T1110.002",
+                "name": "Password Cracking",
+                "similarity": 0.535
+              },
+              {
+                "id": "T1201",
+                "name": "Password Policy Discovery",
+                "similarity": 0.531
+              }
+            ]
+          },
+          "WebAttack": {
+            "query": "Network traffic resembling malicious requests exploiting a public-facing web application.",
+            "rank_of_mapped_technique": 8,
+            "top5": [
+              {
+                "id": "T1496.002",
+                "name": "Bandwidth Hijacking",
+                "similarity": 0.624
+              },
+              {
+                "id": "T1102.002",
+                "name": "Bidirectional Communication",
+                "similarity": 0.602
+              },
+              {
+                "id": "T1189",
+                "name": "Drive-by Compromise",
+                "similarity": 0.601
+              },
+              {
+                "id": "T1185",
+                "name": "Browser Session Hijacking",
+                "similarity": 0.562
+              },
+              {
+                "id": "T1036.012",
+                "name": "Browser Fingerprint",
+                "similarity": 0.561
+              }
+            ]
+          },
+          "Bot": {
+            "query": "Network traffic resembling a compromised host beaconing to a command-and-control server over web protocols.",
+            "rank_of_mapped_technique": 1,
+            "top5": [
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.644
+              },
+              {
+                "id": "T1102.002",
+                "name": "Bidirectional Communication",
+                "similarity": 0.643
+              },
+              {
+                "id": "T1102.003",
+                "name": "One-Way Communication",
+                "similarity": 0.623
+              },
+              {
+                "id": "T1001.003",
+                "name": "Protocol or Service Impersonation",
+                "similarity": 0.609
+              },
+              {
+                "id": "T1665",
+                "name": "Hide Infrastructure",
+                "similarity": 0.589
+              }
+            ]
+          },
+          "Other-rare": {
+            "query": "Network traffic resembling a rare attack: exploiting a vulnerable public-facing TLS service, or a user opening a malicious file followed by internal network scanning.",
+            "rank_of_mapped_technique": 2,
+            "top5": [
+              {
+                "id": "T1496.002",
+                "name": "Bandwidth Hijacking",
+                "similarity": 0.581
+              },
+              {
+                "id": "T1190",
+                "name": "Exploit Public-Facing Application",
+                "similarity": 0.553
+              },
+              {
+                "id": "T1011",
+                "name": "Exfiltration Over Other Network Medium",
+                "similarity": 0.536
+              },
+              {
+                "id": "T1048.003",
+                "name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+                "similarity": 0.532
+              },
+              {
+                "id": "T1665",
+                "name": "Hide Infrastructure",
+                "similarity": 0.528
+              }
+            ]
+          }
+        },
+        "recall_at_3": 0.857,
+        "recall_at_5": 0.857,
+        "mrr": 0.708,
+        "n_queries": 7
+      },
+      "features_only": {
+        "per_family": {
+          "DoS": {
+            "query": "Network traffic sent to port 80/TCP (HTTP). Unusual flow features: Init_Win_bytes_backward higher than 74% of normal flows; Idle Max higher than 99% of normal flows; min_seg_size_forward higher than 75% of normal flows.",
+            "rank_of_mapped_technique": 4,
+            "top5": [
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.483
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.459
+              },
+              {
+                "id": "T1102.002",
+                "name": "Bidirectional Communication",
+                "similarity": 0.435
+              },
+              {
+                "id": "T1499.002",
+                "name": "Service Exhaustion Flood",
+                "similarity": 0.431
+              },
+              {
+                "id": "T1205.002",
+                "name": "Socket Filters",
+                "similarity": 0.424
+              }
+            ]
+          },
+          "DDoS": {
+            "query": "Network traffic sent to port 80/TCP (HTTP). Unusual flow features: Fwd Packet Length Mean lower than 79% of normal flows; Fwd Packet Length Max lower than 80% of normal flows; act_data_pkt_fwd higher than 78% of normal flows.",
+            "rank_of_mapped_technique": 13,
+            "top5": [
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.448
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.436
+              },
+              {
+                "id": "T1048.003",
+                "name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+                "similarity": 0.377
+              },
+              {
+                "id": "T1567",
+                "name": "Exfiltration Over Web Service",
+                "similarity": 0.371
+              },
+              {
+                "id": "T1205.002",
+                "name": "Socket Filters",
+                "similarity": 0.366
+              }
+            ]
+          },
+          "PortScan": {
+            "query": "Network traffic sent to port 1065/TCP. Unusual flow features: Total Length of Fwd Packets lower than 94% of normal flows; Flow Bytes/s higher than 78% of normal flows; Packet Length Mean lower than 87% of normal flows.",
+            "rank_of_mapped_technique": 84,
+            "top5": [
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.45
+              },
+              {
+                "id": "T1205.001",
+                "name": "Port Knocking",
+                "similarity": 0.427
+              },
+              {
+                "id": "T1205.002",
+                "name": "Socket Filters",
+                "similarity": 0.399
+              },
+              {
+                "id": "T1071.002",
+                "name": "File Transfer Protocols",
+                "similarity": 0.363
+              },
+              {
+                "id": "T1571",
+                "name": "Non-Standard Port",
+                "similarity": 0.359
+              }
+            ]
+          },
+          "BruteForce": {
+            "query": "Network traffic sent to port 21/TCP (FTP). Unusual flow features: min_seg_size_forward higher than 75% of normal flows; Flow IAT Max higher than 78% of normal flows; Flow IAT Min higher than 76% of normal flows.",
+            "rank_of_mapped_technique": 616,
+            "top5": [
+              {
+                "id": "T1030",
+                "name": "Data Transfer Size Limits",
+                "similarity": 0.42
+              },
+              {
+                "id": "T1071.002",
+                "name": "File Transfer Protocols",
+                "similarity": 0.405
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.394
+              },
+              {
+                "id": "T1205.002",
+                "name": "Socket Filters",
+                "similarity": 0.366
+              },
+              {
+                "id": "T1011",
+                "name": "Exfiltration Over Other Network Medium",
+                "similarity": 0.362
+              }
+            ]
+          },
+          "WebAttack": {
+            "query": "Network traffic sent to port 80/TCP (HTTP). Unusual flow features: Init_Win_bytes_backward higher than 95% of normal flows; Fwd IAT Min higher than 88% of normal flows.",
+            "rank_of_mapped_technique": 31,
+            "top5": [
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.463
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.449
+              },
+              {
+                "id": "T1102.002",
+                "name": "Bidirectional Communication",
+                "similarity": 0.43
+              },
+              {
+                "id": "T1011",
+                "name": "Exfiltration Over Other Network Medium",
+                "similarity": 0.424
+              },
+              {
+                "id": "T1048.003",
+                "name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+                "similarity": 0.421
+              }
+            ]
+          },
+          "Bot": {
+            "query": "Network traffic sent to port 8080/TCP (HTTP alternate). Unusual flow features: Init_Win_bytes_forward higher than 54% of normal flows; Bwd IAT Min higher than 97% of normal flows; Bwd IAT Std higher than 82% of normal flows.",
+            "rank_of_mapped_technique": 2,
+            "top5": [
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.422
+              },
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.412
+              },
+              {
+                "id": "T1102.002",
+                "name": "Bidirectional Communication",
+                "similarity": 0.407
+              },
+              {
+                "id": "T1011",
+                "name": "Exfiltration Over Other Network Medium",
+                "similarity": 0.389
+              },
+              {
+                "id": "T1499.002",
+                "name": "Service Exhaustion Flood",
+                "similarity": 0.387
+              }
+            ]
+          }
+        },
+        "recall_at_3": 0.167,
+        "recall_at_5": 0.333,
+        "mrr": 0.145,
+        "n_queries": 6
+      }
+    },
+    "tfidf": {
+      "model": "tfidf",
+      "family_description": {
+        "per_family": {
+          "DoS": {
+            "query": "Network traffic resembling a denial-of-service flood of requests exhausting a single server's service.",
+            "rank_of_mapped_technique": 1,
+            "top5": [
+              {
+                "id": "T1499.002",
+                "name": "Service Exhaustion Flood",
+                "similarity": 0.201
+              },
+              {
+                "id": "T1499.003",
+                "name": "Application Exhaustion Flood",
+                "similarity": 0.179
+              },
+              {
+                "id": "T1498",
+                "name": "Network Denial of Service",
+                "similarity": 0.173
+              },
+              {
+                "id": "T1499",
+                "name": "Endpoint Denial of Service",
+                "similarity": 0.156
+              },
+              {
+                "id": "T1498.001",
+                "name": "Direct Network Flood",
+                "similarity": 0.155
+              }
+            ]
+          },
+          "DDoS": {
+            "query": "Network traffic resembling a distributed denial-of-service flood saturating the target's network bandwidth.",
+            "rank_of_mapped_technique": 2,
+            "top5": [
+              {
+                "id": "T1496.002",
+                "name": "Bandwidth Hijacking",
+                "similarity": 0.187
+              },
+              {
+                "id": "T1498",
+                "name": "Network Denial of Service",
+                "similarity": 0.181
+              },
+              {
+                "id": "T1499.002",
+                "name": "Service Exhaustion Flood",
+                "similarity": 0.134
+              },
+              {
+                "id": "T1498.001",
+                "name": "Direct Network Flood",
+                "similarity": 0.133
+              },
+              {
+                "id": "T1499",
+                "name": "Endpoint Denial of Service",
+                "similarity": 0.129
+              }
+            ]
+          },
+          "PortScan": {
+            "query": "Network traffic resembling a port scan probing many ports to discover listening network services.",
+            "rank_of_mapped_technique": 6,
+            "top5": [
+              {
+                "id": "T1205.001",
+                "name": "Port Knocking",
+                "similarity": 0.15
+              },
+              {
+                "id": "T1596.005",
+                "name": "Scan Databases",
+                "similarity": 0.126
+              },
+              {
+                "id": "T1571",
+                "name": "Non-Standard Port",
+                "similarity": 0.1
+              },
+              {
+                "id": "T1595.002",
+                "name": "Vulnerability Scanning",
+                "similarity": 0.099
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.098
+              }
+            ]
+          },
+          "BruteForce": {
+            "query": "Network traffic resembling repeated login attempts guessing passwords against an authentication service.",
+            "rank_of_mapped_technique": 1,
+            "top5": [
+              {
+                "id": "T1110.001",
+                "name": "Password Guessing",
+                "similarity": 0.154
+              },
+              {
+                "id": "T1685.001",
+                "name": "Disable or Modify Windows Event Log",
+                "similarity": 0.097
+              },
+              {
+                "id": "T1020.001",
+                "name": "Traffic Duplication",
+                "similarity": 0.086
+              },
+              {
+                "id": "T1499.003",
+                "name": "Application Exhaustion Flood",
+                "similarity": 0.073
+              },
+              {
+                "id": "T1665",
+                "name": "Hide Infrastructure",
+                "similarity": 0.068
+              }
+            ]
+          },
+          "WebAttack": {
+            "query": "Network traffic resembling malicious requests exploiting a public-facing web application.",
+            "rank_of_mapped_technique": 4,
+            "top5": [
+              {
+                "id": "T1539",
+                "name": "Steal Web Session Cookie",
+                "similarity": 0.112
+              },
+              {
+                "id": "T1595",
+                "name": "Active Scanning",
+                "similarity": 0.108
+              },
+              {
+                "id": "T1056.003",
+                "name": "Web Portal Capture",
+                "similarity": 0.105
+              },
+              {
+                "id": "T1190",
+                "name": "Exploit Public-Facing Application",
+                "similarity": 0.102
+              },
+              {
+                "id": "T1020.001",
+                "name": "Traffic Duplication",
+                "similarity": 0.079
+              }
+            ]
+          },
+          "Bot": {
+            "query": "Network traffic resembling a compromised host beaconing to a command-and-control server over web protocols.",
+            "rank_of_mapped_technique": 1,
+            "top5": [
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.218
+              },
+              {
+                "id": "T1001.003",
+                "name": "Protocol or Service Impersonation",
+                "similarity": 0.161
+              },
+              {
+                "id": "T1090",
+                "name": "Proxy",
+                "similarity": 0.147
+              },
+              {
+                "id": "T1104",
+                "name": "Multi-Stage Channels",
+                "similarity": 0.138
+              },
+              {
+                "id": "T1048",
+                "name": "Exfiltration Over Alternative Protocol",
+                "similarity": 0.127
+              }
+            ]
+          },
+          "Other-rare": {
+            "query": "Network traffic resembling a rare attack: exploiting a vulnerable public-facing TLS service, or a user opening a malicious file followed by internal network scanning.",
+            "rank_of_mapped_technique": 5,
+            "top5": [
+              {
+                "id": "T1204.002",
+                "name": "Malicious File",
+                "similarity": 0.156
+              },
+              {
+                "id": "T1595",
+                "name": "Active Scanning",
+                "similarity": 0.101
+              },
+              {
+                "id": "T1686.002",
+                "name": "Network Device Firewall",
+                "similarity": 0.093
+              },
+              {
+                "id": "T1590.004",
+                "name": "Network Topology",
+                "similarity": 0.092
+              },
+              {
+                "id": "T1204",
+                "name": "User Execution",
+                "similarity": 0.088
+              }
+            ]
+          }
+        },
+        "recall_at_3": 0.571,
+        "recall_at_5": 0.857,
+        "mrr": 0.588,
+        "n_queries": 7
+      },
+      "features_only": {
+        "per_family": {
+          "DoS": {
+            "query": "Network traffic sent to port 80/TCP (HTTP). Unusual flow features: Init_Win_bytes_backward higher than 74% of normal flows; Idle Max higher than 99% of normal flows; min_seg_size_forward higher than 75% of normal flows.",
+            "rank_of_mapped_technique": 47,
+            "top5": [
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.1
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.095
+              },
+              {
+                "id": "T1547",
+                "name": "Boot or Logon Autostart Execution",
+                "similarity": 0.076
+              },
+              {
+                "id": "T1665",
+                "name": "Hide Infrastructure",
+                "similarity": 0.075
+              },
+              {
+                "id": "T1548",
+                "name": "Abuse Elevation Control Mechanism",
+                "similarity": 0.074
+              }
+            ]
+          },
+          "DDoS": {
+            "query": "Network traffic sent to port 80/TCP (HTTP). Unusual flow features: Fwd Packet Length Mean lower than 79% of normal flows; Fwd Packet Length Max lower than 80% of normal flows; act_data_pkt_fwd higher than 78% of normal flows.",
+            "rank_of_mapped_technique": 11,
+            "top5": [
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.082
+              },
+              {
+                "id": "T1205.002",
+                "name": "Socket Filters",
+                "similarity": 0.078
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.078
+              },
+              {
+                "id": "T1665",
+                "name": "Hide Infrastructure",
+                "similarity": 0.062
+              },
+              {
+                "id": "T1030",
+                "name": "Data Transfer Size Limits",
+                "similarity": 0.06
+              }
+            ]
+          },
+          "PortScan": {
+            "query": "Network traffic sent to port 1065/TCP. Unusual flow features: Total Length of Fwd Packets lower than 94% of normal flows; Flow Bytes/s higher than 78% of normal flows; Packet Length Mean lower than 87% of normal flows.",
+            "rank_of_mapped_technique": 77,
+            "top5": [
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.097
+              },
+              {
+                "id": "T1574",
+                "name": "Hijack Execution Flow",
+                "similarity": 0.073
+              },
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.067
+              },
+              {
+                "id": "T1498.001",
+                "name": "Direct Network Flood",
+                "similarity": 0.062
+              },
+              {
+                "id": "T1557",
+                "name": "Adversary-in-the-Middle",
+                "similarity": 0.062
+              }
+            ]
+          },
+          "BruteForce": {
+            "query": "Network traffic sent to port 21/TCP (FTP). Unusual flow features: min_seg_size_forward higher than 75% of normal flows; Flow IAT Max higher than 78% of normal flows; Flow IAT Min higher than 76% of normal flows.",
+            "rank_of_mapped_technique": 556,
+            "top5": [
+              {
+                "id": "T1574",
+                "name": "Hijack Execution Flow",
+                "similarity": 0.097
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.08
+              },
+              {
+                "id": "T1557",
+                "name": "Adversary-in-the-Middle",
+                "similarity": 0.075
+              },
+              {
+                "id": "T1574.013",
+                "name": "KernelCallbackTable",
+                "similarity": 0.07
+              },
+              {
+                "id": "T1071.002",
+                "name": "File Transfer Protocols",
+                "similarity": 0.066
+              }
+            ]
+          },
+          "WebAttack": {
+            "query": "Network traffic sent to port 80/TCP (HTTP). Unusual flow features: Init_Win_bytes_backward higher than 95% of normal flows; Fwd IAT Min higher than 88% of normal flows.",
+            "rank_of_mapped_technique": 206,
+            "top5": [
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.103
+              },
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.102
+              },
+              {
+                "id": "T1665",
+                "name": "Hide Infrastructure",
+                "similarity": 0.076
+              },
+              {
+                "id": "T1547.010",
+                "name": "Port Monitors",
+                "similarity": 0.069
+              },
+              {
+                "id": "T1557",
+                "name": "Adversary-in-the-Middle",
+                "similarity": 0.069
+              }
+            ]
+          },
+          "Bot": {
+            "query": "Network traffic sent to port 8080/TCP (HTTP alternate). Unusual flow features: Init_Win_bytes_forward higher than 54% of normal flows; Bwd IAT Min higher than 97% of normal flows; Bwd IAT Std higher than 82% of normal flows.",
+            "rank_of_mapped_technique": 1,
+            "top5": [
+              {
+                "id": "T1071.001",
+                "name": "Web Protocols",
+                "similarity": 0.091
+              },
+              {
+                "id": "T1205",
+                "name": "Traffic Signaling",
+                "similarity": 0.086
+              },
+              {
+                "id": "T1048",
+                "name": "Exfiltration Over Alternative Protocol",
+                "similarity": 0.083
+              },
+              {
+                "id": "T1056.004",
+                "name": "Credential API Hooking",
+                "similarity": 0.069
+              },
+              {
+                "id": "T1547",
+                "name": "Boot or Logon Autostart Execution",
+                "similarity": 0.069
+              }
+            ]
+          }
+        },
+        "recall_at_3": 0.167,
+        "recall_at_5": 0.167,
+        "mrr": 0.189,
+        "n_queries": 6
+      }
+    }
+  },
+  "alerts": {
+    "n_alerts": 100,
+    "embedder": "sentence-transformers/all-MiniLM-L6-v2",
+    "ambiguous": 2,
+    "ambiguous_with_a_correct_candidate": 0,
+    "mapped_technique_correct_for_true_label": 0.96,
+    "ambiguous_examples": [
+      {
+        "alert_id": "a-1930899",
+        "family": "Bot",
+        "confidence": 0.4375,
+        "true_label": "BENIGN",
+        "candidates": [
+          "T1102.002",
+          "T1205",
+          "T1205.002"
+        ]
+      },
+      {
+        "alert_id": "a-2517660",
+        "family": "Bot",
+        "confidence": 0.4653,
+        "true_label": "Bot",
+        "candidates": [
+          "T1102.002",
+          "T1205",
+          "T1205.002"
+        ]
+      }
+    ]
+  }
+}

@@ -224,8 +224,29 @@ The blueprint planned Day 6 for 17 Nov and Day 7 for 18 Nov; both were built on 
 - Fixed five misplaced `# fmt: skip` comments in `detect/compare.py` (ruff RUF028), which would
   have failed CI's lint step.
 
+### First real-data run (16 Nov, `make alerts`)
+- **LightGBM's alerts are slower than the MLP's: 37 ms vs 10.6 ms median per alert.** Detection
+  itself is 0.49 ms; the rest is TreeSHAP. `pred_contrib` explains all 7 classes over 143 rounds
+  of 7 trees, while we keep only the predicted class. Integrated Gradients (64 steps through a
+  60k-parameter network) is cheaper. Both are far below the LLM call that follows (seconds), so
+  this does not matter yet.
+- **Attribution checks hold on real data.** SHAP additivity error was 4e-14. IG completeness error
+  was 0.6% median, but 0.23 logits on the worst alert; raise `n_steps` to 128 if a report figure
+  needs it tighter.
+- **The MLP's sample has more false positives: 10 of 100 alerts are really BENIGN, against 4 for
+  LightGBM.** Most are predicted Bot (only 7 of its 16 Bot alerts are real), as Bot precision
+  0.59 predicts. The sample is stratified, so these counts are not error rates. They do mean the
+  explanation layer must cope with wrong alerts; the analyst view's "false-positive
+  considerations" field (Day 8) is there for that.
+- **Mapped techniques are correct for 96 of 100 LightGBM alerts**, i.e. all 96 true attacks; the 4
+  misses are the BENIGN false positives, for which no technique is correct. 2 alerts were
+  ambiguous (Bot at confidence 0.44 and 0.47) and got embedding candidates.
+- **MiniLM beats TF-IDF when the query describes the attack** (recall@3 0.86 vs 0.57) and is equally
+  poor from flow features alone (0.17). WebAttack was the miss: MiniLM ranked T1190 8th for
+  "malicious requests exploiting a public-facing web application". The query is not tuned on this
+  result, since that would make the check measure the tuning.
+- The afternoon-timestamp rule fired on 42 (LightGBM) and 47 (MLP) of 100 alerts, with 0 parse
+  failures.
+
 ### Open
-- Run `make alerts` on the real data (after `make pipeline`), then copy the numbers into the README
-  and blueprint section 2: alert latency, MiniLM recall@3 and the correct-technique ceiling.
-- `uv.lock` needs regenerating (`uv lock`) for the new dependencies: faker, captum,
-  sentence-transformers, and dev-only shap.
+- Day 8: Ollama, prompts, JSON-schema output, manager and analyst views for 20 alerts.

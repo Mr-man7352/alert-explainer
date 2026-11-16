@@ -1,0 +1,113 @@
+{
+  "model": "lightgbm",
+  "model_version": "lightgbm-2026-11-15T14:56:13+00:00",
+  "attribution_method": "TreeSHAP (LightGBM pred_contrib), raw score of the predicted family",
+  "n_alerts": 100,
+  "by_predicted_family": {
+    "BruteForce": 17,
+    "DoS": 17,
+    "DDoS": 17,
+    "PortScan": 17,
+    "WebAttack": 16,
+    "Bot": 16
+  },
+  "by_severity": {
+    "High": 37,
+    "Critical": 33,
+    "Medium": 28,
+    "Low": 2
+  },
+  "by_true_label": {
+    "DDoS": 17,
+    "PortScan": 17,
+    "DoS Hulk": 16,
+    "FTP-Patator": 13,
+    "Web Attack - Brute Force": 12,
+    "Bot": 12,
+    "SSH-Patator": 4,
+    "Web Attack - XSS": 4,
+    "BENIGN": 4,
+    "DoS slowloris": 1
+  },
+  "misclassified_family": 4,
+  "false_positives_true_benign": 4,
+  "by_confidence_band": {
+    "high": 95,
+    "medium": 3,
+    "low": 2
+  },
+  "by_affected_asset_criticality": {
+    "3": 84,
+    "1": 13,
+    "2": 3
+  },
+  "affected_asset_in_inventory": 100,
+  "top_features_by_family": {
+    "Bot": {
+      "Destination Port": 16,
+      "Init_Win_bytes_forward": 15,
+      "Bwd IAT Std": 8,
+      "Init_Win_bytes_backward": 8,
+      "Flow IAT Min": 7
+    },
+    "BruteForce": {
+      "Destination Port": 17,
+      "min_seg_size_forward": 17,
+      "Flow IAT Min": 16,
+      "Flow IAT Max": 13,
+      "Bwd Header Length": 13
+    },
+    "DDoS": {
+      "Fwd Packet Length Mean": 17,
+      "Fwd Packet Length Max": 17,
+      "min_seg_size_forward": 17,
+      "act_data_pkt_fwd": 10,
+      "Total Length of Fwd Packets": 9
+    },
+    "DoS": {
+      "Destination Port": 17,
+      "Init_Win_bytes_backward": 15,
+      "Idle Min": 12,
+      "Flow Packets/s": 12,
+      "Idle Max": 11
+    },
+    "PortScan": {
+      "Total Length of Fwd Packets": 17,
+      "Flow Bytes/s": 17,
+      "Packet Length Mean": 17,
+      "Packet Length Std": 10,
+      "Init_Win_bytes_forward": 9
+    },
+    "WebAttack": {
+      "Init_Win_bytes_backward": 16,
+      "Fwd IAT Min": 16,
+      "Destination Port": 16,
+      "Init_Win_bytes_forward": 15,
+      "min_seg_size_forward": 13
+    }
+  },
+  "latency_per_alert_ms": {
+    "median": 36.96,
+    "p95": 50.48,
+    "includes": "detection + calibration + attribution + severity + Alert validation, one flow at a time, CPU"
+  },
+  "timestamps_afternoon_rule": 42,
+  "timestamps_unparsed": 0,
+  "split": "test",
+  "flows_scored": 378155,
+  "flows_flagged": 64134,
+  "flagged_by_family": {
+    "DoS": 29120,
+    "DDoS": 19206,
+    "PortScan": 13726,
+    "BruteForce": 1373,
+    "WebAttack": 322,
+    "Bot": 387
+  },
+  "attribution_check": {
+    "shap_additivity_max_abs_error": 4.263256414560601e-14
+  },
+  "inventory_assets": 15,
+  "seed": 42,
+  "total_seconds": 23.4
+}
